@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Lock } from 'lucide-react';
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Lock } from "lucide-react";
 
 export default function SignupPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = 'Sign Up | AgentHub';
+    document.title = "Sign Up | FlowStack";
   }, []);
 
   return (
@@ -20,7 +20,8 @@ export default function SignupPage() {
             Registration Closed
           </h2>
           <p className="text-surface-600 dark:text-surface-400 mb-6">
-            This is a private marketplace. Only authorized administrators can create and sell agents.
+            This is a private marketplace. Only authorized administrators can
+            create and sell agents.
           </p>
           <Link
             to="/login"

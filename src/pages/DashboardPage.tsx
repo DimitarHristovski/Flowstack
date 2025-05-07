@@ -53,7 +53,7 @@ export default function DashboardPage() {
 
   // Update page title
   useEffect(() => {
-    document.title = `${t("dashboard.overview.title")} | AgentHub`;
+    document.title = `${t("dashboard.overview.title")} | FlowStack`;
   }, [t]);
 
   // Fetch user profile
@@ -252,7 +252,6 @@ export default function DashboardPage() {
             ))}
           </div>
         </aside>
-
         {/* Mobile sidebar */}
         {isMobileSidebarOpen && (
           <div className="fixed inset-0 bg-surface-900/50 backdrop-blur-sm z-50 flex lg:hidden">
@@ -304,7 +303,7 @@ export default function DashboardPage() {
             ></div>
           </div>
         )}
-
+        FlowStack
         {/* Main content */}
         <main className="flex-1 overflow-y-auto bg-surface-100 dark:bg-surface-900 p-4 md:p-6">
           <Routes>
