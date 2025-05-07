@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, Download, Filter, XCircle, CheckCircle, AlertCircle, Layers, RefreshCw, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { cn } from '../../lib/utils';
+import { useLogStore } from '../../lib/store';
+import { toast } from 'sonner';
 
 type LogType = 'info' | 'error' | 'warning' | 'success';
 type LogSource = 'system' | 'agent' | 'task' | 'user';
@@ -28,103 +30,13 @@ export default function LogsPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
   
-  // Mock logs data
-  const mockLogs: Log[] = [
-    {
-      id: '1',
-      type: 'info',
-      source: 'system',
-      message: 'System started successfully',
-      details: 'All services initialized and running. Memory usage: 256MB, CPU: 5%',
-      timestamp: '2023-10-16T09:00:00Z',
-    },
-    {
-      id: '2',
-      type: 'error',
-      source: 'agent',
-      message: 'Agent failed to access external API',
-      details: 'Personal Finance Advisor encountered a timeout while trying to connect to financial data service. Error code: TIMEOUT_ERROR',
-      timestamp: '2023-10-16T09:15:00Z',
-      agent: 'Personal Finance Advisor',
-    },
-    {
-      id: '3',
-      type: 'success',
-      source: 'task',
-      message: 'Task completed successfully',
-      details: 'Blog post about AI trends was created successfully. Word count: 1523, Time taken: 2h 15m',
-      timestamp: '2023-10-16T11:45:00Z',
-      agent: 'Content Writer Pro',
-      task: 'Write a blog post about AI trends',
-    },
-    {
-      id: '4',
-      type: 'warning',
-      source: 'system',
-      message: 'High resource usage detected',
-      details: 'System is experiencing high CPU usage (85%). This may affect performance.',
-      timestamp: '2023-10-16T12:30:00Z',
-    },
-    {
-      id: '5',
-      type: 'info',
-      source: 'agent',
-      message: 'Agent started new task',
-      details: 'Research Assistant started analyzing market data for Q3 report. Estimated completion time: 1h 30m',
-      timestamp: '2023-10-16T14:20:00Z',
-      agent: 'Research Assistant',
-      task: 'Analyze Q3 financial report',
-    },
-    {
-      id: '6',
-      type: 'info',
-      source: 'user',
-      message: 'User updated agent settings',
-      details: 'User (john.doe@example.com) updated settings for Email Manager agent. Changed response templates and priority rules.',
-      timestamp: '2023-10-16T15:05:00Z',
-      agent: 'Email Manager',
-    },
-    {
-      id: '7',
-      type: 'warning',
-      source: 'task',
-      message: 'Task taking longer than expected',
-      details: 'The code optimization task is taking longer than the estimated time. Original estimate: 45m, Current duration: 1h 10m',
-      timestamp: '2023-10-16T15:30:00Z',
-      agent: 'Code Assistant',
-      task: 'Optimize landing page code',
-    },
-    {
-      id: '8',
-      type: 'success',
-      source: 'system',
-      message: 'Automatic backup completed',
-      details: 'System successfully completed the scheduled daily backup. Backup size: 2.3GB, Duration: 5m',
-      timestamp: '2023-10-16T16:00:00Z',
-    },
-    {
-      id: '9',
-      type: 'error',
-      source: 'task',
-      message: 'Task failed to complete',
-      details: 'The task failed due to insufficient data. Agent could not access required financial records to complete the analysis.',
-      timestamp: '2023-10-16T16:30:00Z',
-      agent: 'Personal Finance Advisor',
-      task: 'Analyze monthly expenses and suggest budget optimizations',
-    },
-    {
-      id: '10',
-      type: 'info',
-      source: 'user',
-      message: 'User created new task',
-      details: 'User (john.doe@example.com) created a new task for Email Manager agent: "Respond to customer inquiries"',
-      timestamp: '2023-10-16T16:45:00Z',
-      agent: 'Email Manager',
-      task: 'Respond to customer inquiries',
-    },
-  ];
+  const { logs, loading, fetchLogs, exportLogs } = useLogStore();
+
+  // Fetch logs on mount
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
   
-  // Toggle log expansion
   const toggleLogExpansion = (logId: string) => {
     const newExpandedLogs = new Set(expandedLogs);
     if (expandedLogs.has(logId)) {
@@ -136,7 +48,7 @@ export default function LogsPage() {
   };
   
   // Filter logs
-  const filteredLogs = mockLogs.filter((log) => {
+  const filteredLogs = logs.filter((log) => {
     // Filter by search query
     if (
       searchQuery &&
@@ -161,8 +73,8 @@ export default function LogsPage() {
   
   // Sort logs
   const sortedLogs = [...filteredLogs].sort((a, b) => {
-    const dateA = new Date(a.timestamp).getTime();
-    const dateB = new Date(b.timestamp).getTime();
+    const dateA = new Date(a.created_at).getTime();
+    const dateB = new Date(b.created_at).getTime();
     
     if (sortOrder === 'newest') {
       return dateB - dateA;
@@ -173,11 +85,11 @@ export default function LogsPage() {
   
   // Get counts by type
   const logCounts = {
-    all: mockLogs.length,
-    info: mockLogs.filter(log => log.type === 'info').length,
-    error: mockLogs.filter(log => log.type === 'error').length,
-    warning: mockLogs.filter(log => log.type === 'warning').length,
-    success: mockLogs.filter(log => log.type === 'success').length,
+    all: logs.length,
+    info: logs.filter(log => log.type === 'info').length,
+    error: logs.filter(log => log.type === 'error').length,
+    warning: logs.filter(log => log.type === 'warning').length,
+    success: logs.filter(log => log.type === 'success').length,
   };
   
   // Helper function for log type icon and color
@@ -227,6 +139,16 @@ export default function LogsPage() {
     });
   };
 
+  // Handle log export
+  const handleExport = async () => {
+    try {
+      await exportLogs();
+      toast.success('Logs exported successfully');
+    } catch (error) {
+      toast.error('Failed to export logs');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between">
@@ -235,6 +157,7 @@ export default function LogsPage() {
           <Button
             variant="outline"
             leftIcon={<Download size={16} />}
+            onClick={handleExport}
           >
             Export Logs
           </Button>
@@ -366,28 +289,33 @@ export default function LogsPage() {
       </div>
       
       {/* Logs list */}
-      <div className="space-y-4">
-        {sortedLogs.length === 0 ? (
-          <div className="bg-white dark:bg-surface-800 rounded-lg shadow-sm border border-surface-200 dark:border-surface-700 p-8 text-center">
-            <Layers size={48} className="mx-auto text-surface-400 mb-4" />
-            <h3 className="text-lg font-medium text-surface-900 dark:text-white mb-2">No logs found</h3>
-            <p className="text-surface-600 dark:text-surface-400 mb-6">
-              No logs match the current filter criteria.
-            </p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setTypeFilter('all');
-                setSourceFilter('all');
-                setSearchQuery('');
-              }}
-            >
-              Clear Filters
-            </Button>
-          </div>
-        ) : (
-          sortedLogs.map((log, index) => {
-            const typeInfo = getLogTypeInfo(log.type);
+      {loading ? (
+        <div className="text-center py-12">
+          <RefreshCw size={32} className="animate-spin mx-auto text-primary-500 mb-4" />
+          <p className="text-surface-600 dark:text-surface-400">Loading logs...</p>
+        </div>
+      ) : sortedLogs.length === 0 ? (
+        <div className="bg-white dark:bg-surface-800 rounded-lg shadow-sm border border-surface-200 dark:border-surface-700 p-8 text-center">
+          <Layers size={48} className="mx-auto text-surface-400 mb-4" />
+          <h3 className="text-lg font-medium text-surface-900 dark:text-white mb-2">No logs found</h3>
+          <p className="text-surface-600 dark:text-surface-400 mb-6">
+            No logs match the current filter criteria.
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setTypeFilter('all');
+              setSourceFilter('all');
+              setSearchQuery('');
+            }}
+          >
+            Clear Filters
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {sortedLogs.map((log, index) => {
+            const typeInfo = getLogTypeInfo(log.type as LogType);
             const isExpanded = expandedLogs.has(log.id);
             
             return (
@@ -419,19 +347,19 @@ export default function LogsPage() {
                         <h3 className="text-sm font-medium text-surface-900 dark:text-white">{log.message}</h3>
                         <div className="mt-1 text-xs text-surface-500 dark:text-surface-400 flex flex-wrap gap-x-4 gap-y-1">
                           <span>
-                            {formatTimestamp(log.timestamp)}
+                            {formatTimestamp(log.created_at)}
                           </span>
                           <span className="capitalize">
                             Source: {log.source}
                           </span>
-                          {log.agent && (
+                          {log.agents?.name && (
                             <span>
-                              Agent: {log.agent}
+                              Agent: {log.agents.name}
                             </span>
                           )}
-                          {log.task && (
+                          {log.tasks?.title && (
                             <span className="truncate max-w-[200px]">
-                              Task: {log.task}
+                              Task: {log.tasks.title}
                             </span>
                           )}
                         </div>
@@ -458,9 +386,9 @@ export default function LogsPage() {
                 </div>
               </motion.div>
             );
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
       
       {/* Pagination */}
       {sortedLogs.length > 0 && (

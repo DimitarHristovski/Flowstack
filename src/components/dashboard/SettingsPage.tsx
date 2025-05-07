@@ -1,96 +1,109 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Lock, CreditCard, Bell, Globe, Eye, EyeOff, CheckCircle, Save } from 'lucide-react';
+import { User, Lock, Bell, Globe, Eye, EyeOff, CheckCircle, Save } from 'lucide-react';
 import { Button } from '../ui/Button';
-
-// Mock settings data
-interface UserProfile {
-  name: string;
-  email: string;
-  company: string;
-  timeZone: string;
-  language: string;
-}
-
-interface NotificationSettings {
-  emailNotifications: boolean;
-  taskCompletions: boolean;
-  agentStatus: boolean;
-  systemUpdates: boolean;
-  marketingEmails: boolean;
-}
+import { useProfileStore, useAuthStore } from '../../lib/store';
+import { toast } from 'sonner';
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<string>('profile');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
-  const [updateSuccess, setUpdateSuccess] = useState<boolean>(false);
   
-  // Mock user profile data
-  const [profile, setProfile] = useState<UserProfile>({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    company: 'Acme Inc.',
-    timeZone: 'America/New_York',
-    language: i18n.language,
+  // Profile state
+  const { profile, updateProfile } = useProfileStore();
+  const [profileData, setProfileData] = useState({
+    full_name: '',
+    company: '',
+    website: '',
   });
-  
-  // Mock notification settings
-  const [notifications, setNotifications] = useState<NotificationSettings>({
+
+  // Password state
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  // Notification settings
+  const [notifications, setNotifications] = useState({
     emailNotifications: true,
     taskCompletions: true,
     agentStatus: true,
     systemUpdates: false,
     marketingEmails: false,
   });
-  
-  const handleProfileUpdate = (e: React.FormEvent) => {
+
+  // Load profile data
+  useEffect(() => {
+    if (profile) {
+      setProfileData({
+        full_name: profile.full_name || '',
+        company: profile.company || '',
+        website: profile.website || '',
+      });
+    }
+  }, [profile]);
+
+  // Handle profile update
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await updateProfile(profileData);
+      toast.success('Profile updated successfully');
+    } catch (error) {
+      toast.error('Failed to update profile');
+    } finally {
       setIsUpdating(false);
-      setUpdateSuccess(true);
-      
-      // Reset success message after 3 seconds
-      setTimeout(() => {
-        setUpdateSuccess(false);
-      }, 3000);
-    }, 1000);
+    }
   };
   
-  const handlePasswordUpdate = (e: React.FormEvent) => {
+  // Handle password update
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsUpdating(false);
-      setUpdateSuccess(true);
+
+    try {
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+
+      // Here you would typically call your password update function
+      // For now, we'll just simulate success
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Reset success message after 3 seconds
-      setTimeout(() => {
-        setUpdateSuccess(false);
-      }, 3000);
-    }, 1000);
+      toast.success('Password updated successfully');
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update password');
+    } finally {
+      setIsUpdating(false);
+    }
   };
   
-  const handleNotificationUpdate = (e: React.FormEvent) => {
+  // Handle notification update
+  const handleNotificationUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsUpdating(false);
-      setUpdateSuccess(true);
+    try {
+      // Here you would typically call your notification settings update function
+      // For now, we'll just simulate success
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Reset success message after 3 seconds
-      setTimeout(() => {
-        setUpdateSuccess(false);
-      }, 3000);
-    }, 1000);
+      toast.success('Notification preferences updated');
+    } catch (error) {
+      toast.error('Failed to update notification preferences');
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -115,7 +128,7 @@ export default function SettingsPage() {
                 className={`flex items-center w-full p-2 rounded-md text-left transition-colors ${
                   activeTab === 'profile'
                     ? 'bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400'
-                    : 'hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300'
+                    : 'hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white'
                 }`}
               >
                 <User size={18} className="mr-3" />
@@ -126,7 +139,7 @@ export default function SettingsPage() {
                 className={`flex items-center w-full p-2 rounded-md text-left transition-colors ${
                   activeTab === 'password'
                     ? 'bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400'
-                    : 'hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300'
+                    : 'hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white'
                 }`}
               >
                 <Lock size={18} className="mr-3" />
@@ -137,22 +150,11 @@ export default function SettingsPage() {
                 className={`flex items-center w-full p-2 rounded-md text-left transition-colors ${
                   activeTab === 'notifications'
                     ? 'bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400'
-                    : 'hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300'
+                    : 'hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white'
                 }`}
               >
                 <Bell size={18} className="mr-3" />
                 <span>Notifications</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('billing')}
-                className={`flex items-center w-full p-2 rounded-md text-left transition-colors ${
-                  activeTab === 'billing'
-                    ? 'bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400'
-                    : 'hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300'
-                }`}
-              >
-                <CreditCard size={18} className="mr-3" />
-                <span>Billing</span>
               </button>
             </div>
           </div>
@@ -177,21 +179,8 @@ export default function SettingsPage() {
                         <input
                           type="text"
                           id="name"
-                          value={profile.name}
-                          onChange={(e) => setProfile({...profile, name: e.target.value})}
-                          className="w-full rounded-md border border-surface-300 dark:border-surface-600 px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                          Email
-                        </label>
-                        <input
-                          type="email"
-                          id="email"
-                          value={profile.email}
-                          onChange={(e) => setProfile({...profile, email: e.target.value})}
+                          value={profileData.full_name}
+                          onChange={(e) => setProfileData({...profileData, full_name: e.target.value})}
                           className="w-full rounded-md border border-surface-300 dark:border-surface-600 px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                       </div>
@@ -203,34 +192,23 @@ export default function SettingsPage() {
                         <input
                           type="text"
                           id="company"
-                          value={profile.company}
-                          onChange={(e) => setProfile({...profile, company: e.target.value})}
+                          value={profileData.company}
+                          onChange={(e) => setProfileData({...profileData, company: e.target.value})}
                           className="w-full rounded-md border border-surface-300 dark:border-surface-600 px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                       </div>
                       
                       <div>
-                        <label htmlFor="timezone" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                          Time Zone
+                        <label htmlFor="website" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                          Website
                         </label>
-                        <select
-                          id="timezone"
-                          value={profile.timeZone}
-                          onChange={(e) => setProfile({...profile, timeZone: e.target.value})}
+                        <input
+                          type="url"
+                          id="website"
+                          value={profileData.website}
+                          onChange={(e) => setProfileData({...profileData, website: e.target.value})}
                           className="w-full rounded-md border border-surface-300 dark:border-surface-600 px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        >
-                          <option value="America/New_York">Eastern Time (US & Canada)</option>
-                          <option value="America/Chicago">Central Time (US & Canada)</option>
-                          <option value="America/Denver">Mountain Time (US & Canada)</option>
-                          <option value="America/Los_Angeles">Pacific Time (US & Canada)</option>
-                          <option value="Europe/London">London</option>
-                          <option value="Europe/Paris">Paris</option>
-                          <option value="Europe/Berlin">Berlin</option>
-                          <option value="Europe/Athens">Athens</option>
-                          <option value="Asia/Tokyo">Tokyo</option>
-                          <option value="Asia/Shanghai">Shanghai</option>
-                          <option value="Australia/Sydney">Sydney</option>
-                        </select>
+                        />
                       </div>
                       
                       <div>
@@ -241,11 +219,8 @@ export default function SettingsPage() {
                           <Globe size={16} className="text-surface-500" />
                           <select
                             id="language"
-                            value={profile.language}
-                            onChange={(e) => {
-                              setProfile({...profile, language: e.target.value});
-                              i18n.changeLanguage(e.target.value);
-                            }}
+                            value={i18n.language}
+                            onChange={(e) => i18n.changeLanguage(e.target.value)}
                             className="w-full rounded-md border border-surface-300 dark:border-surface-600 px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                           >
                             <option value="en">English</option>
@@ -256,7 +231,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     
-                    <div className="mt-6 flex items-center">
+                    <div className="mt-6">
                       <Button
                         type="submit"
                         leftIcon={isUpdating ? undefined : <Save size={16} />}
@@ -265,13 +240,6 @@ export default function SettingsPage() {
                       >
                         {isUpdating ? 'Saving...' : 'Save Changes'}
                       </Button>
-                      
-                      {updateSuccess && (
-                        <div className="ml-4 text-success-500 flex items-center">
-                          <CheckCircle size={16} className="mr-1" />
-                          <span>Profile updated successfully!</span>
-                        </div>
-                      )}
                     </div>
                   </form>
                 </div>
@@ -295,6 +263,8 @@ export default function SettingsPage() {
                           <input
                             type={showPassword ? 'text' : 'password'}
                             id="current-password"
+                            value={passwordData.currentPassword}
+                            onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
                             className="w-full rounded-md border border-surface-300 dark:border-surface-600 pr-10 pl-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                           />
                           <button
@@ -315,6 +285,8 @@ export default function SettingsPage() {
                           <input
                             type={showPassword ? 'text' : 'password'}
                             id="new-password"
+                            value={passwordData.newPassword}
+                            onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                             className="w-full rounded-md border border-surface-300 dark:border-surface-600 pr-10 pl-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                           />
                           <button
@@ -335,6 +307,8 @@ export default function SettingsPage() {
                           <input
                             type={showPassword ? 'text' : 'password'}
                             id="confirm-password"
+                            value={passwordData.confirmPassword}
+                            onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
                             className="w-full rounded-md border border-surface-300 dark:border-surface-600 pr-10 pl-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                           />
                           <button
@@ -348,7 +322,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     
-                    <div className="mt-6 flex items-center">
+                    <div className="mt-6">
                       <Button
                         type="submit"
                         leftIcon={isUpdating ? undefined : <Save size={16} />}
@@ -357,13 +331,6 @@ export default function SettingsPage() {
                       >
                         {isUpdating ? 'Updating...' : 'Update Password'}
                       </Button>
-                      
-                      {updateSuccess && (
-                        <div className="ml-4 text-success-500 flex items-center">
-                          <CheckCircle size={16} className="mr-1" />
-                          <span>Password updated successfully!</span>
-                        </div>
-                      )}
                     </div>
                   </form>
                 </div>
@@ -485,7 +452,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     
-                    <div className="mt-6 flex items-center">
+                    <div className="mt-6">
                       <Button
                         type="submit"
                         leftIcon={isUpdating ? undefined : <Save size={16} />}
@@ -494,135 +461,8 @@ export default function SettingsPage() {
                       >
                         {isUpdating ? 'Saving...' : 'Save Preferences'}
                       </Button>
-                      
-                      {updateSuccess && (
-                        <div className="ml-4 text-success-500 flex items-center">
-                          <CheckCircle size={16} className="mr-1" />
-                          <span>Notification preferences updated!</span>
-                        </div>
-                      )}
                     </div>
                   </form>
-                </div>
-              </>
-            )}
-            
-            {/* Billing settings */}
-            {activeTab === 'billing' && (
-              <>
-                <div className="p-4 border-b border-surface-200 dark:border-surface-700">
-                  <h2 className="text-lg font-medium text-surface-900 dark:text-white">Billing & Subscription</h2>
-                </div>
-                <div className="p-4">
-                  <div className="bg-primary-50 dark:bg-primary-900/30 rounded-lg p-4 border border-primary-100 dark:border-primary-800 mb-6">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="text-lg font-medium text-surface-900 dark:text-white">Pro Plan</h3>
-                        <p className="text-surface-600 dark:text-surface-400 text-sm">
-                          $29/month • Renews on October 12, 2025
-                        </p>
-                      </div>
-                      <Button variant="outline">
-                        Manage Subscription
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-md font-medium text-surface-900 dark:text-white mb-3">Payment Method</h3>
-                      <div className="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div className="h-10 w-16 bg-surface-100 dark:bg-surface-700 rounded-md flex items-center justify-center mr-3">
-                              <span className="text-surface-700 dark:text-surface-300 font-medium">VISA</span>
-                            </div>
-                            <div>
-                              <p className="text-surface-900 dark:text-white font-medium">•••• •••• •••• 4242</p>
-                              <p className="text-surface-500 dark:text-surface-400 text-sm">Expires 12/2025</p>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            Edit
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-md font-medium text-surface-900 dark:text-white mb-3">Billing History</h3>
-                      <div className="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg overflow-hidden">
-                        <table className="min-w-full divide-y divide-surface-200 dark:divide-surface-700">
-                          <thead className="bg-surface-50 dark:bg-surface-800">
-                            <tr>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
-                                Date
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
-                                Description
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
-                                Amount
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider">
-                                Receipt
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white dark:bg-surface-800 divide-y divide-surface-200 dark:divide-surface-700">
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                Sep 12, 2025
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                Pro Plan - Monthly
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                $29.00
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                Aug 12, 2025
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                Pro Plan - Monthly
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                $29.00
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                Jul 12, 2025
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                Pro Plan - Monthly
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-surface-900 dark:text-white">
-                                $29.00
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <Button variant="ghost" size="sm">
-                                  Download
-                                </Button>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </>
             )}
