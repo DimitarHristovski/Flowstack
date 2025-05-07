@@ -1,23 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, Play, PlusCircle, CheckCircle, Clock, AlertCircle, RefreshCw, Filter, SlidersHorizontal, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { cn } from '../../lib/utils';
+import { useTaskStore, useAgentStore } from '../../lib/store';
+import { toast } from 'sonner';
 
 type TaskStatus = 'completed' | 'in-progress' | 'queued' | 'failed';
 type SortOrder = 'newest' | 'oldest';
 
-interface Task {
-  id: string;
+interface NewTaskData {
   title: string;
   description: string;
-  agent: string;
-  status: TaskStatus;
-  createdAt: string;
-  completedAt?: string;
   priority: 'low' | 'medium' | 'high';
-  duration?: string;
+  agent_id: string | null;
 }
 
 export default function TasksPage() {
@@ -27,94 +24,75 @@ export default function TasksPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [selectedAgent, setSelectedAgent] = useState<string>('all');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newTaskData, setNewTaskData] = useState<NewTaskData>({
+    title: '',
+    description: '',
+    priority: 'medium',
+    agent_id: null,
+  });
   
-  // Mock tasks data
-  const mockTasks: Task[] = [
-    {
-      id: '1',
-      title: 'Write a blog post about AI trends',
-      description: 'Create a 1500-word article covering the latest trends in artificial intelligence, focusing on practical applications for businesses.',
-      agent: 'Content Writer Pro',
-      status: 'completed',
-      createdAt: '2023-10-15T09:30:00Z',
-      completedAt: '2023-10-15T11:45:00Z',
-      priority: 'high',
-      duration: '2h 15m',
-    },
-    {
-      id: '2',
-      title: 'Analyze Q3 financial report',
-      description: 'Review the Q3 financial data, identify key trends, and prepare a summary with actionable insights.',
-      agent: 'Research Assistant',
-      status: 'in-progress',
-      createdAt: '2023-10-16T14:20:00Z',
-      priority: 'high',
-    },
-    {
-      id: '3',
-      title: 'Respond to customer inquiries',
-      description: 'Process and respond to 15 customer support emails with appropriate information and solutions.',
-      agent: 'Email Manager',
-      status: 'queued',
-      createdAt: '2023-10-16T16:45:00Z',
-      priority: 'medium',
-    },
-    {
-      id: '4',
-      title: 'Optimize landing page code',
-      description: 'Review and refactor the JavaScript code for the marketing landing page to improve performance.',
-      agent: 'Code Assistant',
-      status: 'in-progress',
-      createdAt: '2023-10-14T11:00:00Z',
-      priority: 'medium',
-    },
-    {
-      id: '5',
-      title: 'Schedule social media posts for the week',
-      description: 'Create and schedule 5 LinkedIn posts and 10 Twitter posts about our latest product release.',
-      agent: 'Social Media Manager',
-      status: 'completed',
-      createdAt: '2023-10-13T09:15:00Z',
-      completedAt: '2023-10-13T12:30:00Z',
-      priority: 'medium',
-      duration: '3h 15m',
-    },
-    {
-      id: '6',
-      title: 'Analyze monthly expenses and suggest budget optimizations',
-      description: 'Review October expenses, categorize them, and provide recommendations for cost savings.',
-      agent: 'Personal Finance Advisor',
-      status: 'failed',
-      createdAt: '2023-10-15T13:20:00Z',
-      priority: 'low',
-    },
-    {
-      id: '7',
-      title: 'Reorganize project tasks and deadlines',
-      description: 'Review all current tasks, organize by priority, and adjust deadlines for the product launch.',
-      agent: 'Task Organizer',
-      status: 'completed',
-      createdAt: '2023-10-12T10:30:00Z',
-      completedAt: '2023-10-12T11:45:00Z',
-      priority: 'high',
-      duration: '1h 15m',
-    },
-    {
-      id: '8',
-      title: 'Transcribe and summarize team meeting',
-      description: 'Create a detailed summary with action items from the product team\'s weekly meeting.',
-      agent: 'Meeting Summarizer',
-      status: 'queued',
-      createdAt: '2023-10-16T18:00:00Z',
-      priority: 'low',
-    },
-  ];
-  
-  // Get unique agents
-  const agents = ['all', ...Array.from(new Set(mockTasks.map(task => task.agent)))];
-  
+  const { tasks, loading, fetchTasks, addTask, updateTask, deleteTask } = useTaskStore();
+  const { agents, fetchAgents } = useAgentStore();
+
+  // Fetch tasks and agents on mount
+  useEffect(() => {
+    fetchTasks();
+    fetchAgents();
+  }, [fetchTasks, fetchAgents]);
+
+  // Handle task creation
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await addTask(newTaskData);
+      toast.success('Task created successfully');
+      setIsCreateModalOpen(false);
+      setNewTaskData({
+        title: '',
+        description: '',
+        priority: 'medium',
+        agent_id: null,
+      });
+    } catch (error) {
+      toast.error('Failed to create task');
+    }
+  };
+
+  // Handle task deletion
+  const handleDeleteTask = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this task?')) {
+      try {
+        await deleteTask(id);
+        toast.success('Task deleted successfully');
+      } catch (error) {
+        toast.error('Failed to delete task');
+      }
+    }
+  };
+
+  // Handle task start
+  const handleStartTask = async (id: string) => {
+    try {
+      await updateTask(id, { status: 'in-progress' });
+      toast.success('Task started successfully');
+    } catch (error) {
+      toast.error('Failed to start task');
+    }
+  };
+
+  // Handle task retry
+  const handleRetryTask = async (id: string) => {
+    try {
+      await updateTask(id, { status: 'queued' });
+      toast.success('Task queued for retry');
+    } catch (error) {
+      toast.error('Failed to retry task');
+    }
+  };
+
   // Filter tasks
-  const filteredTasks = mockTasks.filter((task) => {
+  const filteredTasks = tasks.filter((task) => {
     // Filter by search query
     if (
       searchQuery &&
@@ -135,7 +113,7 @@ export default function TasksPage() {
     }
     
     // Filter by agent
-    if (selectedAgent !== 'all' && task.agent !== selectedAgent) {
+    if (selectedAgent !== 'all' && task.agent_id !== selectedAgent) {
       return false;
     }
     
@@ -144,23 +122,23 @@ export default function TasksPage() {
   
   // Sort tasks
   const sortedTasks = [...filteredTasks].sort((a, b) => {
-    const dateA = new Date(a.createdAt).getTime();
-    const dateB = new Date(b.createdAt).getTime();
-    
-    if (sortOrder === 'newest') {
-      return dateB - dateA;
-    } else {
-      return dateA - dateB;
+    switch (sortOrder) {
+      case 'newest':
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      case 'oldest':
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      default:
+        return 0;
     }
   });
   
   // Get counts by status
   const taskCounts = {
-    all: mockTasks.length,
-    completed: mockTasks.filter(task => task.status === 'completed').length,
-    'in-progress': mockTasks.filter(task => task.status === 'in-progress').length,
-    queued: mockTasks.filter(task => task.status === 'queued').length,
-    failed: mockTasks.filter(task => task.status === 'failed').length,
+    all: tasks.length,
+    completed: tasks.filter(task => task.status === 'completed').length,
+    'in-progress': tasks.filter(task => task.status === 'in-progress').length,
+    queued: tasks.filter(task => task.status === 'queued').length,
+    failed: tasks.filter(task => task.status === 'failed').length,
   };
   
   // Helper function for status badge
@@ -197,32 +175,6 @@ export default function TasksPage() {
     }
   };
   
-  // Helper function for priority badge
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-error-100 dark:bg-error-900/30 text-error-700 dark:text-error-400">
-            High
-          </span>
-        );
-      case 'medium':
-        return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-400">
-            Medium
-          </span>
-        );
-      case 'low':
-        return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-400">
-            Low
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
-  
   // Format dates
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -242,6 +194,7 @@ export default function TasksPage() {
         <div className="mt-4 sm:mt-0">
           <Button
             leftIcon={<PlusCircle size={16} />}
+            onClick={() => setIsCreateModalOpen(true)}
           >
             Create New Task
           </Button>
@@ -326,18 +279,6 @@ export default function TasksPage() {
                 {taskCounts.failed}
               </span>
             </Button>
-            
-            <div className="relative ml-auto">
-              <Button
-                variant="outline"
-                size="sm"
-                leftIcon={<SlidersHorizontal size={14} />}
-                rightIcon={<ChevronDown size={14} />}
-                className="whitespace-nowrap"
-              >
-                More Filters
-              </Button>
-            </div>
           </div>
         </div>
         
@@ -363,9 +304,10 @@ export default function TasksPage() {
               onChange={(e) => setSelectedAgent(e.target.value)}
               className="bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded p-1 text-surface-900 dark:text-white"
             >
+              <option value="all">All Agents</option>
               {agents.map((agent) => (
-                <option key={agent} value={agent}>
-                  {agent === 'all' ? 'All Agents' : agent}
+                <option key={agent.id} value={agent.id}>
+                  {agent.name}
                 </option>
               ))}
             </select>
@@ -409,120 +351,224 @@ export default function TasksPage() {
       </div>
       
       {/* Tasks list */}
-      <div className="space-y-4">
-        {sortedTasks.map((task, index) => (
-          <motion.div
-            key={task.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, delay: index * 0.05 }}
-            className="bg-white dark:bg-surface-800 rounded-lg shadow-sm border border-surface-200 dark:border-surface-700 overflow-hidden"
-          >
-            <div className="p-4 sm:p-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-start gap-2">
-                    <h3 className="text-lg font-semibold text-surface-900 dark:text-white">{task.title}</h3>
-                    {getPriorityBadge(task.priority)}
+      {loading ? (
+        <div className="text-center py-12">
+          <RefreshCw size={32} className="animate-spin mx-auto text-primary-500 mb-4" />
+          <p className="text-surface-600 dark:text-surface-400">Loading tasks...</p>
+        </div>
+      ) : sortedTasks.length === 0 ? (
+        <div className="text-center py-16 bg-white dark:bg-surface-800 rounded-lg border border-dashed border-surface-300 dark:border-surface-700">
+          <Clock size={48} className="mx-auto text-surface-400 mb-4" />
+          <h3 className="text-lg font-medium text-surface-900 dark:text-white mb-2">No tasks found</h3>
+          <p className="text-surface-600 dark:text-surface-400 mb-6">
+            {searchQuery || statusFilter !== 'all' || selectedPriority !== 'all' || selectedAgent !== 'all'
+              ? 'Try adjusting your filters to find what you\'re looking for.'
+              : 'No tasks have been created yet. Create your first task to get started.'}
+          </p>
+          <div className="flex justify-center space-x-4">
+            {(searchQuery || statusFilter !== 'all' || selectedPriority !== 'all' || selectedAgent !== 'all') && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setStatusFilter('all');
+                  setSelectedPriority('all');
+                  setSelectedAgent('all');
+                  setSearchQuery('');
+                }}
+              >
+                Clear Filters
+              </Button>
+            )}
+            <Button
+              leftIcon={<PlusCircle size={16} />}
+              onClick={() => setIsCreateModalOpen(true)}
+            >
+              Create New Task
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {sortedTasks.map((task, index) => (
+            <motion.div
+              key={task.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: index * 0.05 }}
+              className="bg-white dark:bg-surface-800 rounded-lg shadow-sm border border-surface-200 dark:border-surface-700 overflow-hidden"
+            >
+              <div className="p-4 sm:p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-start gap-2">
+                      <h3 className="text-lg font-semibold text-surface-900 dark:text-white">{task.title}</h3>
+                      <span className={cn(
+                        'px-2 py-0.5 rounded-md text-xs font-medium',
+                        task.priority === 'high' ? 'bg-error-100 dark:bg-error-900/30 text-error-700 dark:text-error-400' :
+                        task.priority === 'medium' ? 'bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-400' :
+                        'bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-400'
+                      )}>
+                        {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                      </span>
+                    </div>
+                    <div className="mt-1 text-sm text-surface-600 dark:text-surface-400">
+                      Agent: {agents.find(a => a.id === task.agent_id)?.name || 'Unassigned'}
+                    </div>
                   </div>
-                  <div className="mt-1 text-sm text-surface-600 dark:text-surface-400">
-                    Agent: {task.agent}
+                  <div className="mt-2 sm:mt-0">
+                    {getStatusBadge(task.status as TaskStatus)}
                   </div>
                 </div>
-                <div className="mt-2 sm:mt-0">
-                  {getStatusBadge(task.status)}
-                </div>
-              </div>
-              
-              <p className="text-sm text-surface-600 dark:text-surface-400 mb-4">{task.description}</p>
-              
-              <div className="flex flex-wrap gap-4 text-xs text-surface-500 dark:text-surface-400">
-                <div>
-                  Created: {formatDate(task.createdAt)}
-                </div>
-                {task.completedAt && (
+                
+                <p className="text-sm text-surface-600 dark:text-surface-400 mb-4">{task.description}</p>
+                
+                <div className="flex flex-wrap gap-4 text-xs text-surface-500 dark:text-surface-400">
                   <div>
-                    Completed: {formatDate(task.completedAt)}
+                    Created: {formatDate(task.created_at)}
                   </div>
-                )}
-                {task.duration && (
-                  <div>
-                    Duration: {task.duration}
-                  </div>
-                )}
-              </div>
-              
-              <div className="mt-4 flex flex-wrap gap-2">
-                {task.status === 'queued' && (
+                  {task.completed_at && (
+                    <div>
+                      Completed: {formatDate(task.completed_at)}
+                    </div>
+                  )}
+                  {task.duration && (
+                    <div>
+                      Duration: {task.duration}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {task.status === 'queued' && (
+                    <Button
+                      size="sm"
+                      leftIcon={<Play size={14} />}
+                      onClick={() => handleStartTask(task.id)}
+                    >
+                      Run Now
+                    </Button>
+                  )}
+                  
+                  {task.status === 'failed' && (
+                    <Button
+                      size="sm"
+                      leftIcon={<RefreshCw size={14} />}
+                      onClick={() => handleRetryTask(task.id)}
+                    >
+                      Retry
+                    </Button>
+                  )}
+                  
                   <Button
+                    variant="outline"
                     size="sm"
-                    leftIcon={<Play size={14} />}
                   >
-                    Run Now
+                    View Details
                   </Button>
-                )}
-                
-                {task.status === 'failed' && (
+                  
                   <Button
+                    variant="outline"
                     size="sm"
-                    leftIcon={<RefreshCw size={14} />}
+                    className="text-error-500 hover:text-error-600 dark:hover:text-error-400 hover:border-error-300 dark:hover:border-error-800"
+                    onClick={() => handleDeleteTask(task.id)}
                   >
-                    Retry
+                    Delete
                   </Button>
-                )}
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                >
-                  View Details
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-error-500 hover:text-error-600 dark:hover:text-error-400 hover:border-error-300 dark:hover:border-error-800"
-                >
-                  Delete
-                </Button>
+                </div>
               </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Create Task Modal */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 bg-surface-900/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-surface-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-4 border-b border-surface-200 dark:border-surface-700">
+              <h3 className="text-lg font-medium text-surface-900 dark:text-white">Create New Task</h3>
             </div>
-          </motion.div>
-        ))}
-        
-        {/* Empty state */}
-        {sortedTasks.length === 0 && (
-          <div className="bg-white dark:bg-surface-800 rounded-lg shadow-sm border border-surface-200 dark:border-surface-700 p-8 text-center">
-            <Clock size={48} className="mx-auto text-surface-400 mb-4" />
-            <h3 className="text-lg font-medium text-surface-900 dark:text-white mb-2">No tasks found</h3>
-            <p className="text-surface-600 dark:text-surface-400 mb-6">
-              {statusFilter !== 'all' || selectedPriority !== 'all' || selectedAgent !== 'all' || searchQuery
-                ? 'Try adjusting your filters to find what you\'re looking for.'
-                : 'No tasks have been created yet. Create your first task to get started.'}
-            </p>
-            <div className="flex justify-center space-x-4">
-              {(statusFilter !== 'all' || selectedPriority !== 'all' || selectedAgent !== 'all' || searchQuery) && (
+            <form onSubmit={handleCreateTask} className="p-4">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={newTaskData.title}
+                    onChange={(e) => setNewTaskData({ ...newTaskData, title: e.target.value })}
+                    required
+                    className="w-full rounded-md border border-surface-300 dark:border-surface-600 px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    value={newTaskData.description}
+                    onChange={(e) => setNewTaskData({ ...newTaskData, description: e.target.value })}
+                    required
+                    rows={3}
+                    className="w-full rounded-md border border-surface-300 dark:border-surface-600 px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                    Priority
+                  </label>
+                  <select
+                    value={newTaskData.priority}
+                    onChange={(e) => setNewTaskData({ ...newTaskData, priority: e.target.value as 'low' | 'medium' | 'high' })}
+                    className="w-full rounded-md border border-surface-300 dark:border-surface-600 px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                    Assign Agent
+                  </label>
+                  <select
+                    value={newTaskData.agent_id || ''}
+                    onChange={(e) => setNewTaskData({ ...newTaskData, agent_id: e.target.value || null })}
+                    className="w-full rounded-md border border-surface-300 dark:border-surface-600 px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Unassigned</option>
+                    {agents.map((agent) => (
+                      <option key={agent.id} value={agent.id}>
+                        {agent.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end space-x-3">
                 <Button
                   variant="outline"
                   onClick={() => {
-                    setStatusFilter('all');
-                    setSelectedPriority('all');
-                    setSelectedAgent('all');
-                    setSearchQuery('');
+                    setIsCreateModalOpen(false);
+                    setNewTaskData({
+                      title: '',
+                      description: '',
+                      priority: 'medium',
+                      agent_id: null,
+                    });
                   }}
                 >
-                  Clear Filters
+                  Cancel
                 </Button>
-              )}
-              <Button
-                leftIcon={<PlusCircle size={16} />}
-              >
-                Create New Task
-              </Button>
-            </div>
+                <Button type="submit">
+                  Create Task
+                </Button>
+              </div>
+            </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,17 +1,18 @@
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, DollarSign, Users, Briefcase } from 'lucide-react';
+import { useEffect } from "react";
+import { motion } from "framer-motion";
+import { MapPin, DollarSign, Users, Briefcase } from "lucide-react";
 
 export default function CareersPage() {
   useEffect(() => {
-    document.title = 'Careers | AgentHub';
+    document.title = "Careers | FlowStack";
   }, []);
 
   const benefits = [
     {
       icon: <DollarSign className="w-6 h-6 text-primary-500" />,
       title: "Competitive Salary",
-      description: "We offer top-market compensation packages including equity options.",
+      description:
+        "We offer top-market compensation packages including equity options.",
     },
     {
       icon: <Users className="w-6 h-6 text-primary-500" />,
@@ -21,7 +22,8 @@ export default function CareersPage() {
     {
       icon: <Briefcase className="w-6 h-6 text-primary-500" />,
       title: "Learning Budget",
-      description: "Annual budget for courses, conferences, and professional development.",
+      description:
+        "Annual budget for courses, conferences, and professional development.",
     },
     {
       icon: <MapPin className="w-6 h-6 text-primary-500" />,
@@ -75,7 +77,7 @@ export default function CareersPage() {
       <div className="bg-surface-900 dark:bg-surface-950 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -83,13 +85,14 @@ export default function CareersPage() {
             >
               Join Our Team
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-xl text-surface-300 max-w-3xl mx-auto"
             >
-              Help us shape the future of AI and make a meaningful impact on how people work.
+              Help us shape the future of AI and make a meaningful impact on how
+              people work.
             </motion.p>
           </div>
         </div>
@@ -99,10 +102,11 @@ export default function CareersPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-surface-900 dark:text-white mb-4">
-            Why Join AgentHub?
+            Why Join FlowStack?
           </h2>
           <p className="text-surface-600 dark:text-surface-400 max-w-2xl mx-auto">
-            We offer a range of benefits to help you do your best work and live your best life.
+            We offer a range of benefits to help you do your best work and live
+            your best life.
           </p>
         </div>
 
@@ -137,7 +141,8 @@ export default function CareersPage() {
               Open Positions
             </h2>
             <p className="text-surface-600 dark:text-surface-400 max-w-2xl mx-auto">
-              Find your next role at AgentHub and help us build the future of work.
+              Find your next role at FlowStack and help us build the future of
+              work.
             </p>
           </div>
 
@@ -184,7 +189,8 @@ export default function CareersPage() {
           Don't see the right role?
         </h2>
         <p className="text-surface-600 dark:text-surface-400 mb-8 max-w-2xl mx-auto">
-          We're always looking for talented individuals to join our team. Send us your resume and we'll keep you in mind for future opportunities.
+          We're always looking for talented individuals to join our team. Send
+          us your resume and we'll keep you in mind for future opportunities.
         </p>
         <button className="bg-primary-500 hover:bg-primary-600 text-white px-8 py-3 rounded-lg transition-colors">
           Send Resume

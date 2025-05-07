@@ -1,18 +1,20 @@
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Calendar, Clock, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useEffect } from "react";
+import { motion } from "framer-motion";
+import { Calendar, Clock, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function BlogPage() {
   useEffect(() => {
-    document.title = 'Blog | AgentHub';
+    document.title = "Blog | FlowStack";
   }, []);
 
   const featuredPost = {
-    slug: 'future-of-ai-agents',
+    slug: "future-of-ai-agents",
     title: "The Future of AI Agents in Enterprise Automation",
-    excerpt: "Discover how AI agents are transforming enterprise workflows and what the future holds for business automation.",
-    image: "https://images.pexels.com/photos/8386434/pexels-photo-8386434.jpeg?auto=compress&cs=tinysrgb&w=1260",
+    excerpt:
+      "Discover how AI agents are transforming enterprise workflows and what the future holds for business automation.",
+    image:
+      "https://images.pexels.com/photos/8386434/pexels-photo-8386434.jpeg?auto=compress&cs=tinysrgb&w=1260",
     date: "March 15, 2025",
     readTime: "8 min read",
     category: "AI Trends",
@@ -20,55 +22,67 @@ export default function BlogPage() {
 
   const posts = [
     {
-      slug: '5-ways-ai-customer-service',
+      slug: "5-ways-ai-customer-service",
       title: "5 Ways AI Agents Are Revolutionizing Customer Service",
-      excerpt: "Learn how businesses are using AI agents to provide 24/7 customer support and improve satisfaction rates.",
-      image: "https://images.pexels.com/photos/7567557/pexels-photo-7567557.jpeg?auto=compress&cs=tinysrgb&w=600",
+      excerpt:
+        "Learn how businesses are using AI agents to provide 24/7 customer support and improve satisfaction rates.",
+      image:
+        "https://images.pexels.com/photos/7567557/pexels-photo-7567557.jpeg?auto=compress&cs=tinysrgb&w=600",
       date: "March 10, 2025",
       readTime: "6 min read",
       category: "Customer Service",
     },
     {
-      slug: 'building-custom-ai-agents',
+      slug: "building-custom-ai-agents",
       title: "Building Custom AI Agents: A Complete Guide",
-      excerpt: "Step-by-step guide to creating and training custom AI agents for your specific business needs.",
-      image: "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600",
+      excerpt:
+        "Step-by-step guide to creating and training custom AI agents for your specific business needs.",
+      image:
+        "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600",
       date: "March 5, 2025",
       readTime: "12 min read",
       category: "Development",
     },
     {
-      slug: 'ai-agent-security',
+      slug: "ai-agent-security",
       title: "AI Agent Security: Best Practices and Guidelines",
-      excerpt: "Essential security measures and guidelines for implementing AI agents in your organization.",
-      image: "https://images.pexels.com/photos/5380642/pexels-photo-5380642.jpeg?auto=compress&cs=tinysrgb&w=600",
+      excerpt:
+        "Essential security measures and guidelines for implementing AI agents in your organization.",
+      image:
+        "https://images.pexels.com/photos/5380642/pexels-photo-5380642.jpeg?auto=compress&cs=tinysrgb&w=600",
       date: "March 1, 2025",
       readTime: "10 min read",
       category: "Security",
     },
     {
-      slug: 'roi-of-ai-agents',
+      slug: "roi-of-ai-agents",
       title: "The ROI of AI Agents: A Case Study",
-      excerpt: "Real-world examples of how companies are achieving ROI with AI agent implementation.",
-      image: "https://images.pexels.com/photos/7567473/pexels-photo-7567473.jpeg?auto=compress&cs=tinysrgb&w=600",
+      excerpt:
+        "Real-world examples of how companies are achieving ROI with AI agent implementation.",
+      image:
+        "https://images.pexels.com/photos/7567473/pexels-photo-7567473.jpeg?auto=compress&cs=tinysrgb&w=600",
       date: "February 25, 2025",
       readTime: "7 min read",
       category: "Business",
     },
     {
-      slug: 'ai-agents-vs-traditional',
+      slug: "ai-agents-vs-traditional",
       title: "AI Agents vs Traditional Automation: What's the Difference?",
-      excerpt: "Understanding the key differences between AI agents and traditional automation solutions.",
-      image: "https://images.pexels.com/photos/8386422/pexels-photo-8386422.jpeg?auto=compress&cs=tinysrgb&w=600",
+      excerpt:
+        "Understanding the key differences between AI agents and traditional automation solutions.",
+      image:
+        "https://images.pexels.com/photos/8386422/pexels-photo-8386422.jpeg?auto=compress&cs=tinysrgb&w=600",
       date: "February 20, 2025",
       readTime: "5 min read",
       category: "Technology",
     },
     {
-      slug: 'ethics-of-ai-agents',
+      slug: "ethics-of-ai-agents",
       title: "The Ethics of AI Agents in the Workplace",
-      excerpt: "Exploring the ethical considerations of implementing AI agents in workplace environments.",
-      image: "https://images.pexels.com/photos/8386464/pexels-photo-8386464.jpeg?auto=compress&cs=tinysrgb&w=600",
+      excerpt:
+        "Exploring the ethical considerations of implementing AI agents in workplace environments.",
+      image:
+        "https://images.pexels.com/photos/8386464/pexels-photo-8386464.jpeg?auto=compress&cs=tinysrgb&w=600",
       date: "February 15, 2025",
       readTime: "9 min read",
       category: "Ethics",
@@ -85,7 +99,10 @@ export default function BlogPage() {
           transition={{ duration: 0.5 }}
           className="bg-white dark:bg-surface-800 rounded-2xl overflow-hidden shadow-sm"
         >
-          <Link to={`/blog/${featuredPost.slug}`} className="grid md:grid-cols-2 gap-8">
+          <Link
+            to={`/blog/${featuredPost.slug}`}
+            className="grid md:grid-cols-2 gap-8"
+          >
             <div className="relative aspect-[16/9] md:aspect-auto">
               <img
                 src={featuredPost.image}

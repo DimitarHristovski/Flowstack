@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Calendar, Clock, ArrowLeft, Share2 } from 'lucide-react';
+import { useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Calendar, Clock, ArrowLeft, Share2 } from "lucide-react";
 
 // Mock blog post data - in a real app, this would come from an API
 const blogPosts = {
-  'future-of-ai-agents': {
+  "future-of-ai-agents": {
     title: "The Future of AI Agents in Enterprise Automation",
     content: `
       <p>Artificial Intelligence (AI) agents are revolutionizing how enterprises handle automation. As we look towards the future, these intelligent assistants are becoming increasingly sophisticated, capable of handling complex tasks that once required human intervention.</p>
@@ -34,9 +34,10 @@ const blogPosts = {
     date: "March 15, 2025",
     readTime: "8 min read",
     category: "AI Trends",
-    image: "https://images.pexels.com/photos/8386434/pexels-photo-8386434.jpeg?auto=compress&cs=tinysrgb&w=1260",
+    image:
+      "https://images.pexels.com/photos/8386434/pexels-photo-8386434.jpeg?auto=compress&cs=tinysrgb&w=1260",
   },
-  '5-ways-ai-customer-service': {
+  "5-ways-ai-customer-service": {
     title: "5 Ways AI Agents Are Revolutionizing Customer Service",
     content: `
       <p>Customer service is undergoing a dramatic transformation thanks to AI agents. Here are five key ways these intelligent assistants are changing the game.</p>
@@ -60,7 +61,8 @@ const blogPosts = {
     date: "March 10, 2025",
     readTime: "6 min read",
     category: "Customer Service",
-    image: "https://images.pexels.com/photos/7567557/pexels-photo-7567557.jpeg?auto=compress&cs=tinysrgb&w=1260",
+    image:
+      "https://images.pexels.com/photos/7567557/pexels-photo-7567557.jpeg?auto=compress&cs=tinysrgb&w=1260",
   },
 };
 
@@ -70,7 +72,7 @@ export default function BlogPostPage() {
 
   useEffect(() => {
     if (post) {
-      document.title = `${post.title} | AgentHub Blog`;
+      document.title = `${post.title} | FlowStack Blog`;
     }
   }, [post]);
 
@@ -150,7 +152,10 @@ export default function BlogPostPage() {
             <div className="flex items-center">
               <div className="mr-4">
                 <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center text-primary-500 font-medium">
-                  {post.author.split(' ').map(n => n[0]).join('')}
+                  {post.author
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </div>
               </div>
               <div>

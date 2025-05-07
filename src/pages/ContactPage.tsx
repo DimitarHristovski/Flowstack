@@ -1,29 +1,29 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, MessageSquare } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Mail, Phone, MapPin, MessageSquare } from "lucide-react";
 
 export default function ContactPage() {
   useEffect(() => {
-    document.title = 'Contact Us | AgentHub';
+    document.title = "Contact Us | FlowStack";
   }, []);
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate form submission
     setTimeout(() => {
       setIsSubmitting(false);
-      setName('');
-      setEmail('');
-      setSubject('');
-      setMessage('');
+      setName("");
+      setEmail("");
+      setSubject("");
+      setMessage("");
       // Show success message
     }, 1500);
   };
@@ -34,7 +34,7 @@ export default function ContactPage() {
       <div className="bg-surface-900 dark:bg-surface-950 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -42,13 +42,14 @@ export default function ContactPage() {
             >
               Get in Touch
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-xl text-surface-300 max-w-3xl mx-auto"
             >
-              Have questions? We're here to help and would love to hear from you.
+              Have questions? We're here to help and would love to hear from
+              you.
             </motion.p>
           </div>
         </div>
@@ -70,7 +71,7 @@ export default function ContactPage() {
               Email Us
             </h3>
             <p className="text-surface-600 dark:text-surface-400">
-              contact@agenthub.ai
+              contact@FlowStack.ai
             </p>
           </motion.div>
 
@@ -122,7 +123,10 @@ export default function ContactPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1"
+                  >
                     Your Name
                   </label>
                   <input
@@ -136,7 +140,10 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1"
+                  >
                     Your Email
                   </label>
                   <input
@@ -151,7 +158,10 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                <label
+                  htmlFor="subject"
+                  className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1"
+                >
                   Subject
                 </label>
                 <input
@@ -165,7 +175,10 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                <label
+                  htmlFor="message"
+                  className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1"
+                >
                   Message
                 </label>
                 <textarea
@@ -183,7 +196,7 @@ export default function ContactPage() {
                 disabled={isSubmitting}
                 className="w-full bg-primary-500 hover:bg-primary-600 text-white py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
+                {isSubmitting ? "Sending..." : "Send Message"}
               </button>
             </form>
           </div>
@@ -208,16 +221,20 @@ export default function ContactPage() {
                 What types of AI agents do you offer?
               </h3>
               <p className="text-surface-600 dark:text-surface-400">
-                We offer a wide range of AI agents specialized in different tasks, from content creation to data analysis. Visit our marketplace to explore the full range of available agents.
+                We offer a wide range of AI agents specialized in different
+                tasks, from content creation to data analysis. Visit our
+                marketplace to explore the full range of available agents.
               </p>
             </div>
 
             <div className="bg-surface-50 dark:bg-surface-900 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-2">
-                How do I get started with AgentHub?
+                How do I get started with FlowStack?
               </h3>
               <p className="text-surface-600 dark:text-surface-400">
-                Getting started is easy! Simply sign up for an account, browse our marketplace, and choose the agents that best fit your needs. We offer a free tier to help you get started.
+                Getting started is easy! Simply sign up for an account, browse
+                our marketplace, and choose the agents that best fit your needs.
+                We offer a free tier to help you get started.
               </p>
             </div>
 
@@ -226,7 +243,9 @@ export default function ContactPage() {
                 What support options are available?
               </h3>
               <p className="text-surface-600 dark:text-surface-400">
-                We offer 24/7 customer support through our help center, email support, and live chat. Enterprise customers also get access to dedicated support representatives.
+                We offer 24/7 customer support through our help center, email
+                support, and live chat. Enterprise customers also get access to
+                dedicated support representatives.
               </p>
             </div>
           </div>

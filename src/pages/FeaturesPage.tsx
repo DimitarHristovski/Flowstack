@@ -1,52 +1,69 @@
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Zap, Shield, BarChart3, Settings, Bot, Brain, Code, MessageSquare } from 'lucide-react';
+import { useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  Zap,
+  Shield,
+  BarChart3,
+  Settings,
+  Bot,
+  Brain,
+  Code,
+  MessageSquare,
+} from "lucide-react";
 
 export default function FeaturesPage() {
   useEffect(() => {
-    document.title = 'Features | AgentHub';
+    document.title = "Features | FlowStack";
   }, []);
 
   const features = [
     {
       icon: <Bot className="w-8 h-8 text-primary-500" />,
       title: "Intelligent AI Agents",
-      description: "Access a marketplace of specialized AI agents designed to handle specific tasks and workflows.",
+      description:
+        "Access a marketplace of specialized AI agents designed to handle specific tasks and workflows.",
     },
     {
       icon: <Brain className="w-8 h-8 text-primary-500" />,
       title: "Advanced Learning",
-      description: "Our agents continuously learn and adapt to your specific needs and preferences.",
+      description:
+        "Our agents continuously learn and adapt to your specific needs and preferences.",
     },
     {
       icon: <Code className="w-8 h-8 text-primary-500" />,
       title: "API Integration",
-      description: "Easily integrate our agents with your existing tools and workflows through our robust API.",
+      description:
+        "Easily integrate our agents with your existing tools and workflows through our robust API.",
     },
     {
       icon: <MessageSquare className="w-8 h-8 text-primary-500" />,
       title: "Natural Communication",
-      description: "Interact with agents using natural language in multiple supported languages.",
+      description:
+        "Interact with agents using natural language in multiple supported languages.",
     },
     {
       icon: <Shield className="w-8 h-8 text-primary-500" />,
       title: "Enterprise Security",
-      description: "Bank-grade security and encryption to protect your sensitive data and communications.",
+      description:
+        "Bank-grade security and encryption to protect your sensitive data and communications.",
     },
     {
       icon: <BarChart3 className="w-8 h-8 text-primary-500" />,
       title: "Analytics & Insights",
-      description: "Detailed analytics and reporting to track agent performance and optimize workflows.",
+      description:
+        "Detailed analytics and reporting to track agent performance and optimize workflows.",
     },
     {
       icon: <Settings className="w-8 h-8 text-primary-500" />,
       title: "Customization",
-      description: "Tailor agents to your specific needs with custom training and configuration options.",
+      description:
+        "Tailor agents to your specific needs with custom training and configuration options.",
     },
     {
       icon: <Zap className="w-8 h-8 text-primary-500" />,
       title: "Real-time Processing",
-      description: "Get instant responses and real-time processing for time-sensitive tasks.",
+      description:
+        "Get instant responses and real-time processing for time-sensitive tasks.",
     },
   ];
 
@@ -56,7 +73,7 @@ export default function FeaturesPage() {
       <div className="bg-surface-900 dark:bg-surface-950 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -64,13 +81,14 @@ export default function FeaturesPage() {
             >
               Powerful Features for Modern Workflows
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-xl text-surface-300 max-w-3xl mx-auto"
             >
-              Discover how our AI agents can transform your productivity and streamline your work processes.
+              Discover how our AI agents can transform your productivity and
+              streamline your work processes.
             </motion.p>
           </div>
         </div>
@@ -106,7 +124,8 @@ export default function FeaturesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to get started?</h2>
           <p className="text-lg text-primary-100 mb-8">
-            Join thousands of users already boosting their productivity with our AI agents.
+            Join thousands of users already boosting their productivity with our
+            AI agents.
           </p>
           <button className="bg-white text-primary-600 px-8 py-3 rounded-lg font-medium hover:bg-primary-50 transition-colors">
             Try for Free
