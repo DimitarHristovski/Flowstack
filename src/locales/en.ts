@@ -6,7 +6,7 @@ const en = {
 
     // Navigation
     "nav.home": "Home",
-    "nav.marketplace": "Marketplace",
+    "nav.marketplace": "Agents",
     "nav.pricing": "Pricing",
     "nav.dashboard": "Dashboard",
     "nav.login": "Log In",
@@ -80,9 +80,9 @@ const en = {
     "landing.pricing.enterprise.cta": "Contact Sales",
 
     // Marketplace page
-    "marketplace.title": "AI Agent Marketplace",
+    "marketplace.title": "Available Agents",
     "marketplace.subtitle":
-      "Browse and discover AI agents to enhance your productivity.",
+      "Browse through our curated collection of AI agents and use any agent you need with your subscription.",
     "marketplace.search.placeholder": "Search agents...",
     "marketplace.filter.title": "Filters",
     "marketplace.filter.categories": "Categories",

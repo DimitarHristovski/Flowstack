@@ -7,9 +7,6 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
 import MarketplacePage from './pages/MarketplacePage';
-import DashboardPage from './pages/DashboardPage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
 import NotFoundPage from './pages/NotFoundPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
@@ -45,20 +42,15 @@ function App() {
   // Don't render anything until mounted to avoid hydration issues
   if (!mounted) return null;
 
-  const isDashboard = location.pathname.startsWith('/dashboard');
-
   return (
     <ThemeProvider>
       <Toaster position="top-right" />
       <div className="flex flex-col min-h-screen">
         <Navbar />
-        <main className={`flex-grow ${isDashboard ? 'bg-surface-100 dark:bg-surface-900' : ''}`}>
+        <main className="flex-grow">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
-            <Route path="/dashboard/*" element={<DashboardPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/cookies" element={<CookiesPage />} />
@@ -72,7 +64,7 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
-        {!isDashboard && <Footer />}
+        <Footer />
       </div>
     </ThemeProvider>
   );

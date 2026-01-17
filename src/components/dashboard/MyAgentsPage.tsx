@@ -25,6 +25,7 @@ import { Button } from '../ui/Button';
 import { cn } from '../../lib/utils';
 import { useAgentStore } from '../../lib/store';
 import { toast } from 'sonner';
+import { AGENT_CATEGORIES, formatCategoryName } from '../../lib/categories';
 
 type AgentStatus = 'active' | 'idle' | 'stopped' | 'error';
 
@@ -481,12 +482,11 @@ export default function MyAgentsPage() {
                     required
                     className="w-full rounded-md border border-surface-300 dark:border-surface-600 px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
-                    <option value="productivity">Productivity</option>
-                    <option value="creativity">Creativity</option>
-                    <option value="research">Research</option>
-                    <option value="communication">Communication</option>
-                    <option value="finance">Finance</option>
-                    <option value="coding">Coding</option>
+                    {AGENT_CATEGORIES.map((category) => (
+                      <option key={category} value={category}>
+                        {formatCategoryName(category)}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

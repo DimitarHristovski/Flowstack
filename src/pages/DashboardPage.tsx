@@ -61,18 +61,11 @@ export default function DashboardPage() {
     fetchProfile();
   }, [fetchProfile]);
 
-  // Check authentication
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
-
   const handleLogout = async () => {
     try {
       await logout();
       toast.success("Successfully logged out");
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       toast.error("Failed to log out");
     }

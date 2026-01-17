@@ -54,22 +54,15 @@ If it has a Python backend:
 pip install -r requirements.txt
 ```
 
-### 3. Configure Environment Variables
-
-Create a `.env` file in the root directory with variables like:
-
-```
-OPENAI_API_KEY=your-key
-PORT=3000
-```
-
-### 4. Start the App
+### 3. Start the App
 
 ```bash
 npm run dev
-# or
-python main.py
 ```
+
+The app will be available at `http://localhost:5173` (or the port shown in the terminal).
+
+**Note:** This app uses local storage for data persistence. No backend or database setup is required.
 
 ---
 

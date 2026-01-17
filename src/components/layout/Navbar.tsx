@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, Sun, Moon, Computer, Globe, ChevronDown } from 'lucide-react';
+import { Menu, X, Sun, Moon, Computer, Globe, ChevronDown, Sparkles, Zap } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { cn } from '../../lib/utils';
+import { useCreditsStore } from '../../lib/store';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
@@ -13,6 +14,12 @@ export default function Navbar() {
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
   const location = useLocation();
   const { theme, setTheme } = useTheme();
+  const { credits, subscription } = useCreditsStore();
+  
+  // Fetch credits on mount
+  useEffect(() => {
+    useCreditsStore.getState().fetchCredits();
+  }, []);
 
   // Check if the navbar should be transparent
   const isHome = location.pathname === '/';
@@ -55,34 +62,42 @@ export default function Navbar() {
             </Link>
           </div>
           
-          <div className="hidden md:flex items-center space-x-8">
-            <NavLink
-              to="/"
-              className={({ isActive }) => cn(
-                'transition-colors hover:text-primary-500',
-                isActive ? 'text-primary-500 font-medium' : ''
+          <div className="hidden md:flex items-center space-x-6">
+            {/* Credits Display */}
+            <Link
+              to="/#pricing"
+              className={cn(
+                'flex items-center space-x-2 px-3 py-1.5 rounded-lg transition-colors',
+                shouldBeTransparent
+                  ? 'bg-white/10 backdrop-blur-sm text-white hover:bg-white/20'
+                  : 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-900/40'
               )}
             >
-              {t('nav.home')}
-            </NavLink>
-            <NavLink
-              to="/marketplace"
-              className={({ isActive }) => cn(
-                'transition-colors hover:text-primary-500',
-                isActive ? 'text-primary-500 font-medium' : ''
-              )}
-            >
-              {t('nav.marketplace')}
-            </NavLink>
-            <NavLink
-              to="/dashboard"
-              className={({ isActive }) => cn(
-                'transition-colors hover:text-primary-500',
-                isActive ? 'text-primary-500 font-medium' : ''
-              )}
-            >
-              {t('nav.dashboard')}
-            </NavLink>
+              <Zap size={16} />
+              <span className="font-semibold">{credits.toLocaleString()}</span>
+              <span className="text-xs opacity-75">executions</span>
+            </Link>
+            
+            <div className="flex items-center space-x-8">
+              <NavLink
+                to="/"
+                className={({ isActive }) => cn(
+                  'transition-colors hover:text-primary-500',
+                  isActive ? 'text-primary-500 font-medium' : ''
+                )}
+              >
+                {t('nav.home')}
+              </NavLink>
+              <NavLink
+                to="/marketplace"
+                className={({ isActive }) => cn(
+                  'transition-colors hover:text-primary-500',
+                  isActive ? 'text-primary-500 font-medium' : ''
+                )}
+              >
+                {t('nav.marketplace')}
+              </NavLink>
+            </div>
             
             <div className="relative">
               <button
@@ -173,19 +188,6 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            
-            <Link
-              to="/login"
-              className="text-surface-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
-            >
-              {t('nav.login')}
-            </Link>
-            <Link
-              to="/signup"
-              className="bg-primary-500 hover:bg-primary-600 text-white py-2 px-4 rounded-md transition-colors"
-            >
-              {t('nav.signup')}
-            </Link>
           </div>
           
           <div className="md:hidden flex items-center">
@@ -226,17 +228,20 @@ export default function Navbar() {
             >
               {t('nav.marketplace')}
             </NavLink>
-            <NavLink
-              to="/dashboard"
-              className={({ isActive }) => cn(
-                'block px-3 py-2 rounded-md text-base font-medium transition-colors',
-                isActive 
-                  ? 'bg-primary-100 dark:bg-primary-900 text-primary-500' 
-                  : 'hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-900 dark:text-white'
-              )}
-            >
-              {t('nav.dashboard')}
-            </NavLink>
+            
+            {/* Mobile Credits Display */}
+            <div className="border-t border-surface-200 dark:border-surface-700 pt-4 pb-3">
+              <Link
+                to="/#pricing"
+                className="flex items-center justify-between px-3 py-2 rounded-md bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
+              >
+                <div className="flex items-center">
+                  <Zap size={18} className="mr-2" />
+                  <span className="font-semibold">Executions</span>
+                </div>
+                <span className="font-bold">{credits.toLocaleString()}</span>
+              </Link>
+            </div>
             
             <div className="border-t border-surface-200 dark:border-surface-700 pt-4 pb-3">
               <div className="px-3 space-y-1">
@@ -311,23 +316,6 @@ export default function Navbar() {
                 >
                   <Computer size={18} />
                 </button>
-              </div>
-            </div>
-            
-            <div className="border-t border-surface-200 dark:border-surface-700 pt-4 pb-3">
-              <div className="px-3 space-y-1">
-                <Link
-                  to="/login"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-surface-900 dark:text-white hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
-                >
-                  {t('nav.login')}
-                </Link>
-                <Link
-                  to="/signup"
-                  className="block px-3 py-2 rounded-md text-base font-medium bg-primary-500 hover:bg-primary-600 text-white transition-colors"
-                >
-                  {t('nav.signup')}
-                </Link>
               </div>
             </div>
           </div>

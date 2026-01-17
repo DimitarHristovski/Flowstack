@@ -58,15 +58,20 @@ export default function TestimonialsSection() {
   }, []);
 
   return (
-    <section className="py-20 bg-surface-100 dark:bg-surface-800">
+    <section className="py-20 bg-gradient-to-b from-white to-surface-50 dark:from-surface-800 dark:to-surface-900">
       <div ref={ref} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-surface-900 dark:text-white">{t('landing.testimonials.title')}</h2>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-surface-900 dark:text-white mb-4">
+            {t('landing.testimonials.title')}
+          </h2>
+          <p className="text-lg text-surface-600 dark:text-surface-400 max-w-2xl mx-auto">
+            See what our customers are saying about FlowStack
+          </p>
         </motion.div>
         
         <div className="relative">
