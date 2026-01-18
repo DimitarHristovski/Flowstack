@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, Bot, ChevronDown, X, Sparkles, Filter, Grid, List, Star, Zap, CheckCircle, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Bot, ChevronDown, X, Sparkles, Filter, Grid, List, Star, Zap, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button';
 import { cn } from '../lib/utils';
@@ -13,16 +14,12 @@ type ViewMode = 'grid' | 'list';
 
 export default function MarketplacePage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<AgentCategory>('all');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState<any | null>(null);
-  const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
-  const [companyName, setCompanyName] = useState('');
-  const [isResearching, setIsResearching] = useState(false);
-  const [researchResults, setResearchResults] = useState<any | null>(null);
 
   const { agents, loading, fetchAgents } = useAgentStore();
   
@@ -73,44 +70,8 @@ export default function MarketplacePage() {
   });
 
   const handleExecuteAgent = async (agent: any) => {
-    // Open the research dashboard modal
-    setSelectedAgent(agent);
-    setIsAgentModalOpen(true);
-  };
-
-  const handleResearch = async () => {
-    if (!selectedAgent || !companyName.trim()) return;
-    
-    setIsResearching(true);
-    try {
-      // Prepare the API body with the company name/URL
-      const apiBody = {
-        company_url: companyName.trim()
-      };
-      
-      const response = await fetch(selectedAgent.apiEndpoint, {
-        method: selectedAgent.apiMethod || 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(selectedAgent.apiHeaders || {})
-        },
-        body: JSON.stringify(apiBody)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API call failed: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      setResearchResults(data);
-      toast.success('Research completed successfully!');
-    } catch (apiError: any) {
-      console.error('API call error:', apiError);
-      toast.error(`Failed to research company: ${apiError.message || 'Unknown error'}`);
-      setResearchResults(null);
-    } finally {
-      setIsResearching(false);
-    }
+    // Navigate to research page
+    navigate(`/research/${agent.id}`);
   };
 
   return (
@@ -459,117 +420,6 @@ export default function MarketplacePage() {
         </div>
       </div>
 
-      {/* Agent Research Dashboard Modal */}
-      {isAgentModalOpen && selectedAgent && (
-        <div 
-          className="fixed inset-0 bg-surface-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => {
-            setIsAgentModalOpen(false);
-            setCompanyName('');
-            setResearchResults(null);
-          }}
-        >
-          <div 
-            className="bg-white dark:bg-surface-800 rounded-2xl shadow-2xl max-w-4xl w-full relative max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-surface-200 dark:border-surface-700 sticky top-0 bg-white dark:bg-surface-800 z-10">
-              <div>
-                <h3 className="text-2xl font-bold text-surface-900 dark:text-white">
-                  {selectedAgent.name}
-                </h3>
-                <p className="text-sm text-surface-600 dark:text-surface-400 mt-1">
-                  {selectedAgent.description}
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  setIsAgentModalOpen(false);
-                  setCompanyName('');
-                  setResearchResults(null);
-                }}
-                className="p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white transition-colors"
-                aria-label="Close modal"
-              >
-                <X size={24} />
-              </button>
-            </div>
-            
-            {/* Research Dashboard Content */}
-            <div className="p-6">
-              {!researchResults ? (
-                <div className="space-y-6">
-                  <div>
-                    <label htmlFor="company-name" className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
-                      Company Name or URL
-                    </label>
-                    <div className="flex gap-3">
-                      <input
-                        id="company-name"
-                        type="text"
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        placeholder="Enter company name or website URL (e.g., Apple, apple.com)"
-                        className="flex-1 px-4 py-3 rounded-xl border-2 border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter' && companyName.trim() && !isResearching) {
-                            handleResearch();
-                          }
-                        }}
-                        disabled={isResearching}
-                      />
-                      <Button
-                        onClick={handleResearch}
-                        disabled={!companyName.trim() || isResearching}
-                        className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isResearching ? (
-                          <>
-                            <Loader2 size={18} className="mr-2 animate-spin" />
-                            Researching...
-                          </>
-                        ) : (
-                          <>
-                            <Search size={18} className="mr-2" />
-                            Research
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-                      Enter a company name or website URL to get comprehensive research and analysis.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-lg font-semibold text-surface-900 dark:text-white">
-                      Research Results for: <span className="text-primary-500">{companyName}</span>
-                    </h4>
-                    <Button
-                      onClick={() => {
-                        setResearchResults(null);
-                        setCompanyName('');
-                      }}
-                      variant="outline"
-                      className="px-4 py-2"
-                    >
-                      New Research
-                    </Button>
-                  </div>
-                  <div className="bg-surface-50 dark:bg-surface-900 rounded-xl p-6 border-2 border-surface-200 dark:border-surface-700">
-                    <pre className="whitespace-pre-wrap text-sm text-surface-700 dark:text-surface-300 font-mono overflow-auto max-h-[500px]">
-                      {JSON.stringify(researchResults, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
